@@ -1,6 +1,7 @@
 package com.elshorihy.tunnle
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.TrafficStats
 import android.net.VpnService
@@ -8,6 +9,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
 import java.util.Locale
@@ -24,7 +27,7 @@ class MainActivity : Activity() {
     private lateinit var connectionButton: ConnectionRingView
     private lateinit var shareSwitch: Switch
 
-    private val servers = listOf(
+    private val servers = mutableListOf(
         ServerProfile("auto", "Auto Select", "🌐", "auto", 0, "AUTO", "Automatic profile selection"),
         ServerProfile("eg-default", "Egypt", "🇪🇬", "Configure host", 443, "TLS", "Add your own endpoint in Profiles"),
         ServerProfile("de-default", "Germany", "🇩🇪", "Configure host", 443, "TLS", "Add your own endpoint in Profiles"),
@@ -68,27 +71,14 @@ class MainActivity : Activity() {
         connectionButton = findViewById(R.id.connectionRing)
         shareSwitch = findViewById(R.id.shareSwitch)
 
-        connectionButton.setOnClickListener {
-            if (connected) disconnectVpn() else requestVpnPermission()
-        }
-
+        connectionButton.setOnClickListener { if (connected) disconnectVpn() else requestVpnPermission() }
         shareSwitch.setOnCheckedChangeListener { button, checked ->
             if (checked) {
                 button.isChecked = false
-                sharingStatus.text = if (connected) {
-                    "Sharing engine will be enabled with the tunnel core"
-                } else {
-                    "Connect VPN first"
-                }
-            } else {
-                sharingStatus.text = "Share this VPN connection"
-            }
+                sharingStatus.text = if (connected) "Sharing engine will be enabled with the tunnel core" else "Connect VPN first"
+            } else sharingStatus.text = "Share this VPN connection"
         }
-
-        findViewById<TextView>(R.id.headerMenu).setOnClickListener {
-            info.text = "Elshori7y Tunnle  •  Secure networking"
-        }
-
+        findViewById<TextView>(R.id.headerMenu).setOnClickListener { info.text = "Elshori7y Tunnle  •  Secure networking" }
         findViewById<Button>(R.id.homeButton).setOnClickListener { showHome() }
         findViewById<Button>(R.id.profilesButton).setOnClickListener { showProfiles() }
         findViewById<Button>(R.id.serversButton).setOnClickListener { showServers() }
@@ -105,46 +95,70 @@ class MainActivity : Activity() {
 
     private fun showProfiles() {
         status.text = "Profiles"
-        info.text = buildString {
-            appendLine("DEFAULT  •  ${selectedServer.name}")
-            appendLine("Protocol: ${selectedServer.protocol}")
-            appendLine("Endpoint: ${selectedServer.host}:${selectedServer.port}")
-            appendLine()
-            appendLine("CONFIG MANAGER")
-            appendLine("Profiles are stored locally.")
-            append("Import/export support is ready for the Elshori7y config format.")
-        }
+        AlertDialog.Builder(this)
+            .setTitle("Elshori7y Profiles")
+            .setItems(servers.map { "${it.country} ${it.name}\n${it.protocol} • ${it.host}:${it.port}" }.toTypedArray()) { _, which ->
+                selectedServer = servers[which]
+                showHome()
+            }
+            .setPositiveButton("Add Config") { _, _ -> showAddConfigDialog() }
+            .setNegativeButton("Close", null)
+            .show()
     }
 
     private fun showServers() {
         status.text = "Servers"
-        info.text = buildString {
-            appendLine("SERVER LIST")
-            appendLine()
-            servers.forEachIndexed { index, server ->
-                val marker = if (server.id == selectedServer.id) "●" else "○"
-                appendLine("$marker ${index + 1}. ${server.country} ${server.name}")
-                appendLine("   ${server.protocol}  •  ${server.host}:${server.port}")
-                appendLine("   ${server.note}")
-                appendLine()
+        AlertDialog.Builder(this)
+            .setTitle("Server List")
+            .setItems(servers.map { "${it.country} ${it.name}   •   ${it.protocol}" }.toTypedArray()) { _, which ->
+                selectedServer = servers[which]
+                serverText.text = "${selectedServer.country}  ${selectedServer.name}"
+                info.text = "Selected server\n${selectedServer.host}:${selectedServer.port}\nProtocol: ${selectedServer.protocol}"
             }
-            append("Selected: ${selectedServer.name}\nTap the server card in the next UI pass to switch profiles.")
+            .setPositiveButton("Add Server") { _, _ -> showAddConfigDialog() }
+            .setNegativeButton("Close", null)
+            .show()
+    }
+
+    private fun showAddConfigDialog() {
+        val box = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(48, 8, 48, 0)
         }
-        serverText.text = "${selectedServer.country}  ${selectedServer.name}"
+        val name = EditText(this).apply { hint = "Profile name" }
+        val host = EditText(this).apply { hint = "Host / IP" }
+        val port = EditText(this).apply { hint = "Port"; inputType = 2; setText("443") }
+        val protocol = EditText(this).apply { hint = "Protocol (e.g. TLS)"; setText("TLS") }
+        box.addView(name); box.addView(host); box.addView(port); box.addView(protocol)
+        AlertDialog.Builder(this)
+            .setTitle("Add Server / Config")
+            .setView(box)
+            .setPositiveButton("Save") { _, _ ->
+                val profile = ServerProfile(
+                    "custom-${System.currentTimeMillis()}",
+                    name.text.toString().ifBlank { "Custom Server" },
+                    "🌐",
+                    host.text.toString().ifBlank { "Not configured" },
+                    port.text.toString().toIntOrNull() ?: 443,
+                    protocol.text.toString().ifBlank { "CUSTOM" },
+                    "User-created profile"
+                )
+                servers.add(profile)
+                selectedServer = profile
+                showHome()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun showLogs() {
         status.text = "Connection Logs"
-        info.text = if (connected) {
-            "Activity Log\nVPN connected\nProfile: ${selectedServer.name}\nService is running\n\nSession timer is active"
-        } else {
-            "Activity Log\nNo active connection\nLast profile: ${selectedServer.name}"
-        }
+        info.text = if (connected) "Activity Log\nVPN connected\nProfile: ${selectedServer.name}\nService is running\n\nSession timer is active" else "Activity Log\nNo active connection\nLast profile: ${selectedServer.name}"
     }
 
     private fun showSettings() {
         status.text = "Settings"
-        info.text = "Connection behavior\nNotifications\nVPN Sharing\nAppearance\n\nConfig format: Elshori7y JSON\nTunnel core: Android VpnService\n\nAdvanced protocol adapters will be added separately."
+        info.text = "Connection behavior\nNotifications\nVPN Sharing\nAppearance\n\nConfig format: Elshori7y profile\nTunnel core: Android VpnService\n\nAdvanced protocol adapters will be added separately."
     }
 
     private fun requestVpnPermission() {
@@ -152,11 +166,7 @@ class MainActivity : Activity() {
         connectionButton.setState(false, true)
         status.text = "Preparing secure connection"
         val intent = VpnService.prepare(this)
-        if (intent != null) {
-            startActivityForResult(intent, vpnRequest)
-        } else {
-            startVpn()
-        }
+        if (intent != null) startActivityForResult(intent, vpnRequest) else startVpn()
     }
 
     @Deprecated("Use Activity Result APIs in a future refactor")
@@ -189,42 +199,27 @@ class MainActivity : Activity() {
     }
 
     private fun updateTrafficStats(now: Long) {
-        val rx = TrafficStats.getTotalRxBytes()
-        val tx = TrafficStats.getTotalTxBytes()
+        val rx = TrafficStats.getTotalRxBytes(); val tx = TrafficStats.getTotalTxBytes()
         val elapsed = (now - lastStatsAt).coerceAtLeast(1L)
         val rxRate = ((rx - lastRx).coerceAtLeast(0L) * 1000L) / elapsed
         val txRate = ((tx - lastTx).coerceAtLeast(0L) * 1000L) / elapsed
         downloadText.text = "↓ ${formatRate(rxRate)}\nDownload"
         uploadText.text = "↑ ${formatRate(txRate)}\nUpload"
         pingText.text = "⌁ —\nPing"
-        lastRx = rx
-        lastTx = tx
-        lastStatsAt = now
+        lastRx = rx; lastTx = tx; lastStatsAt = now
     }
 
-    private fun formatRate(bytesPerSecond: Long): String {
-        return when {
-            bytesPerSecond >= 1024 * 1024 -> String.format(Locale.US, "%.1f MB/s", bytesPerSecond / 1024.0 / 1024.0)
-            bytesPerSecond >= 1024 -> String.format(Locale.US, "%.0f KB/s", bytesPerSecond / 1024.0)
-            else -> "$bytesPerSecond B/s"
-        }
+    private fun formatRate(bytesPerSecond: Long): String = when {
+        bytesPerSecond >= 1024 * 1024 -> String.format(Locale.US, "%.1f MB/s", bytesPerSecond / 1024.0 / 1024.0)
+        bytesPerSecond >= 1024 -> String.format(Locale.US, "%.0f KB/s", bytesPerSecond / 1024.0)
+        else -> "$bytesPerSecond B/s"
     }
 
     private fun resetDisconnected(message: String) {
-        connected = false
-        connecting = false
-        handler.removeCallbacks(ticker)
-        connectionButton.setState(false, false)
-        status.text = "Secure connection"
-        tunnelText.text = "SECURE TUNNEL"
-        downloadText.text = "↓ 0 B/s\nDownload"
-        uploadText.text = "↑ 0 B/s\nUpload"
-        pingText.text = "⌁ —\nPing"
-        info.text = message
+        connected = false; connecting = false; handler.removeCallbacks(ticker)
+        connectionButton.setState(false, false); status.text = "Secure connection"; tunnelText.text = "SECURE TUNNEL"
+        downloadText.text = "↓ 0 B/s\nDownload"; uploadText.text = "↑ 0 B/s\nUpload"; pingText.text = "⌁ —\nPing"; info.text = message
     }
 
-    override fun onDestroy() {
-        handler.removeCallbacks(ticker)
-        super.onDestroy()
-    }
+    override fun onDestroy() { handler.removeCallbacks(ticker); super.onDestroy() }
 }
