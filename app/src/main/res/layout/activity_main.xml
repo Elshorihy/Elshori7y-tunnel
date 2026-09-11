@@ -1,22 +1,223 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:padding="24dp" android:gravity="center_horizontal">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Elshori7y Tunnle" android:textSize="30sp" android:textStyle="bold"
-            android:layout_marginTop="30dp"/>
-        <TextView android:id="@+id/status" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Disconnected" android:textSize="18sp" android:layout_marginTop="10dp"/>
-        <Button android:id="@+id/connectButton" android:layout_width="220dp" android:layout_height="58dp"
-            android:text="CONNECT" android:layout_marginTop="24dp"/>
-        <Button android:id="@+id/shareButton" android:layout_width="220dp" android:layout_height="52dp"
-            android:text="VPN SHARING" android:layout_marginTop="12dp"/>
-        <Button android:id="@+id/profilesButton" android:layout_width="220dp" android:layout_height="52dp"
-            android:text="PROFILES" android:layout_marginTop="12dp"/>
-        <Button android:id="@+id/logsButton" android:layout_width="220dp" android:layout_height="52dp"
-            android:text="LOGS" android:layout_marginTop="12dp"/>
-        <TextView android:id="@+id/info" android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Profile: Default" android:textSize="16sp" android:layout_marginTop="22dp"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0D1218">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="22dp"
+        android:paddingEnd="22dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="10dp"
+        android:gravity="center_vertical">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Elshori7y Tunnle"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/headerMenu"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:gravity="center"
+            android:text="⋮"
+            android:textColor="#B8C6D2"
+            android:textSize="28sp" />
     </LinearLayout>
-</ScrollView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="none">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:paddingBottom="18dp">
+
+            <TextView
+                android:id="@+id/pageTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Secure connection"
+                android:textColor="#8EA2B2"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:layout_marginTop="4dp" />
+
+            <com.elshorihy.tunnle.ConnectionRingView
+                android:id="@+id/connectionRing"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="6dp" />
+
+            <LinearLayout
+                android:id="@+id/speedRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:padding="6dp">
+                <TextView
+                    android:id="@+id/downloadText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="↓ 0 B/s\nDownload"
+                    android:textColor="#BFD0DB"
+                    android:textSize="13sp"
+                    android:gravity="center" />
+                <TextView
+                    android:id="@+id/pingText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="⌁ —\nPing"
+                    android:textColor="#39DCEB"
+                    android:textSize="13sp"
+                    android:gravity="center" />
+                <TextView
+                    android:id="@+id/uploadText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="↑ 0 B/s\nUpload"
+                    android:textColor="#BFD0DB"
+                    android:textSize="13sp"
+                    android:gravity="center" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tunnelVisual"
+                android:layout_width="match_parent"
+                android:layout_height="92dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_card"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="◌  ◌  ◌  ◌  ◌  ◌  ◌"
+                    android:textColor="#39DCEB"
+                    android:textSize="20sp" />
+                <TextView
+                    android:id="@+id/tunnelText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SECURE TUNNEL"
+                    android:textColor="#6D8292"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.15" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_card"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Current profile"
+                        android:textColor="#8093A2"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/profileChip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DEFAULT"
+                        android:textColor="#39DCEB"
+                        android:textSize="11sp"
+                        android:background="@drawable/bg_chip" />
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/serverText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Auto server  •  VPN"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="10dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_card"
+                android:gravity="center_vertical">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="VPN Sharing"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/sharingStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Share this VPN connection"
+                        android:textColor="#8093A2"
+                        android:textSize="12sp"
+                        android:layout_marginTop="3dp" />
+                </LinearLayout>
+                <Switch
+                    android:id="@+id/shareSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ready to connect"
+                android:textColor="#6F8291"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:layout_marginTop="14dp" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_bottom"
+        android:gravity="center"
+        android:weightSum="5">
+        <Button android:id="@+id/homeButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="⌂\nHome" android:textSize="10sp" android:textColor="#39DCEB" android:background="@android:color/transparent" />
+        <Button android:id="@+id/profilesButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="♙\nProfiles" android:textSize="10sp" android:textColor="#A8B7C2" android:background="@android:color/transparent" />
+        <Button android:id="@+id/serversButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="◎\nServers" android:textSize="10sp" android:textColor="#A8B7C2" android:background="@android:color/transparent" />
+        <Button android:id="@+id/logsButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="▤\nLogs" android:textSize="10sp" android:textColor="#A8B7C2" android:background="@android:color/transparent" />
+        <Button android:id="@+id/settingsButton" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="⚙\nSettings" android:textSize="10sp" android:textColor="#A8B7C2" android:background="@android:color/transparent" />
+    </LinearLayout>
+</LinearLayout>
