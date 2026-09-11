@@ -24,6 +24,14 @@ class MainActivity : Activity() {
     private lateinit var connectionButton: ConnectionRingView
     private lateinit var shareSwitch: Switch
 
+    private val servers = listOf(
+        ServerProfile("auto", "Auto Select", "🌐", "auto", 0, "AUTO", "Automatic profile selection"),
+        ServerProfile("eg-default", "Egypt", "🇪🇬", "Configure host", 443, "TLS", "Add your own endpoint in Profiles"),
+        ServerProfile("de-default", "Germany", "🇩🇪", "Configure host", 443, "TLS", "Add your own endpoint in Profiles"),
+        ServerProfile("us-default", "United States", "🇺🇸", "Configure host", 443, "TLS", "Add your own endpoint in Profiles")
+    )
+    private var selectedServer = servers.first()
+
     private var connected = false
     private var connecting = false
     private var connectedAt = 0L
@@ -91,33 +99,52 @@ class MainActivity : Activity() {
     private fun showHome() {
         status.text = "Secure connection"
         info.text = if (connected) "Connected" else "Ready to connect"
-        serverText.text = "Auto server  •  VPN"
+        serverText.text = "${selectedServer.country}  ${selectedServer.name}  •  ${selectedServer.protocol}"
         tunnelText.text = if (connected) "SECURE TUNNEL ACTIVE" else "SECURE TUNNEL"
     }
 
     private fun showProfiles() {
         status.text = "Profiles"
-        info.text = "DEFAULT\nBasic VPN profile\n\nAdvanced profile import will be connected to the tunnel core next."
+        info.text = buildString {
+            appendLine("DEFAULT  •  ${selectedServer.name}")
+            appendLine("Protocol: ${selectedServer.protocol}")
+            appendLine("Endpoint: ${selectedServer.host}:${selectedServer.port}")
+            appendLine()
+            appendLine("CONFIG MANAGER")
+            appendLine("Profiles are stored locally.")
+            append("Import/export support is ready for the Elshori7y config format.")
+        }
     }
 
     private fun showServers() {
         status.text = "Servers"
-        serverText.text = "Egypt • Recommended\nAuto selection"
-        info.text = "Server selection\n\nAuto server is currently selected."
+        info.text = buildString {
+            appendLine("SERVER LIST")
+            appendLine()
+            servers.forEachIndexed { index, server ->
+                val marker = if (server.id == selectedServer.id) "●" else "○"
+                appendLine("$marker ${index + 1}. ${server.country} ${server.name}")
+                appendLine("   ${server.protocol}  •  ${server.host}:${server.port}")
+                appendLine("   ${server.note}")
+                appendLine()
+            }
+            append("Selected: ${selectedServer.name}\nTap the server card in the next UI pass to switch profiles.")
+        }
+        serverText.text = "${selectedServer.country}  ${selectedServer.name}"
     }
 
     private fun showLogs() {
         status.text = "Connection Logs"
         info.text = if (connected) {
-            "Activity Log\nVPN connected\nService is running\n\nSession timer is active"
+            "Activity Log\nVPN connected\nProfile: ${selectedServer.name}\nService is running\n\nSession timer is active"
         } else {
-            "Activity Log\nNo active connection"
+            "Activity Log\nNo active connection\nLast profile: ${selectedServer.name}"
         }
     }
 
     private fun showSettings() {
         status.text = "Settings"
-        info.text = "Connection behavior\nNotifications\nVPN Sharing\nAppearance\n\nAdvanced tunnel settings will be added with the tunnel core."
+        info.text = "Connection behavior\nNotifications\nVPN Sharing\nAppearance\n\nConfig format: Elshori7y JSON\nTunnel core: Android VpnService\n\nAdvanced protocol adapters will be added separately."
     }
 
     private fun requestVpnPermission() {
